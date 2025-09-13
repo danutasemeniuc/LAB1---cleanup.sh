@@ -1,0 +1,38 @@
+#!/bin/bash
+# Script: cleanup.sh
+# Scop: Sterge fisiere temporare (implicit .tmp) dintr-un director
+
+# Verifica daca primul argument (directorul) a fost furnizat
+if [ -z "$1" ]; then
+  echo "Eroare: Trebuie sa specifici directorul de curatare!"
+  echo "Utilizare: $0 <director> [extensie1] [extensie2] ..."
+  exit 1
+fi
+
+# Seteaza directorul tinta din primul argument
+director_tinta=$1
+shift  # elimina primul argument, raman doar extensiile
+
+# Verifica daca directorul exista
+if [ ! -d "$director_tinta" ]; then
+  echo "Eroare: Directorul '$director_tinta' nu exista!"
+  exit 1
+fi
+
+# Daca nu s-a dat nicio extensie, folosim .tmp
+if [ $# -eq 0 ]; then
+  extensii=("tmp")
+else
+  extensii=("$@")
+fi
+
+# Initializeaza contorul fisierelor sterse
+fisiere_sterse=0
+
+# Proceseaza fiecare extensie
+for extensie_curenta in "${extensii[@]}"; do
+  numar_fisiere=$(find "$director_tinta" -type f -name "*.$extensie_curenta" -print -delete | wc -l)
+  fisiere_sterse=$((fisiere_sterse + numar_fisiere))
+done
+
+echo "Curatare completa. Fisiere sterse: $fisiere_sterse"
